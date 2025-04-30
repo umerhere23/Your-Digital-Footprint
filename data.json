@@ -1,0 +1,86 @@
+{
+    "lesson": {
+        "title": "Understanding Your Digital Footprint",
+        "targetAgeGroup": "Secondary (12-18 years)",
+        "topic": "Digital Footprints",
+        "description": "This lesson teaches secondary students about the concept of digital footprints and how to manage their online presence responsibly.",
+        "objectives": [
+            "Define what a digital footprint is",
+            "Identify different types of digital footprints",
+            "Understand the permanence of online actions",
+            "Learn strategies for managing digital footprints"
+        ]
+    },
+    "resources": [
+        {
+            "title": "Common Sense Education",
+            "url": "https://www.commonsense.org/education/digital-citizenship/lesson/digital-footprint-reputation",
+            "type": "website"
+        },
+        {
+            "title": "Digital Footprint Infographic",
+            "url": "https://www.iste.org/explore/digital-citizenship/5-tips-monitoring-your-digital-footprint",
+            "type": "infographic"
+        },
+        {
+            "title": "Digital Compass Game",
+            "url": "https://www.digitalcompass.org",
+            "type": "interactive"
+        },
+        {
+            "title": "Teens and Digital Footprints",
+            "url": "https://www.pewresearch.org/internet/2013/05/21/teens-social-media-and-privacy/",
+            "type": "article"
+        }
+    ],
+    "quiz": {
+        "questions": [
+            {
+                "question": "What is a digital footprint?",
+                "options": [
+                    "A) Your shoe size online",
+                    "B) The trail of data you leave when using the internet",
+                    "C) A special type of computer virus"
+                ],
+                "correctAnswer": "B) The trail of data you leave when using the internet"
+            },
+            {
+                "question": "Which of these contributes to your digital footprint?",
+                "options": [
+                    "A) Social media posts",
+                    "B) Online searches",
+                    "C) Both A and B"
+                ],
+                "correctAnswer": "C) Both A and B"
+            },
+            {
+                "question": "How long does your digital footprint typically last?",
+                "options": [
+                    "A) Until you delete it",
+                    "B) About 1 year",
+                    "C) Potentially forever"
+                ],
+                "correctAnswer": "C) Potentially forever"
+            },
+            {
+                "question": "Who might look at your digital footprint?",
+                "options": [
+                    "A) College admissions officers",
+                    "B) Potential employers",
+                    "C) Both A and B"
+                ],
+                "correctAnswer": "C) Both A and B"
+            },
+            {
+                "question": "What's the best way to manage your digital footprint?",
+                "options": [
+                    "A) Think before you post",
+                    "B) Regularly check your privacy settings",
+                    "C) Both A and B"
+                ],
+                "correctAnswer": "C) Both A and B"
+            }
+        ]
+    },
+    "studentResults": []
+}

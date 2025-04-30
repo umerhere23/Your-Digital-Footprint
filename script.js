@@ -1,180 +1,188 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Footprint infographic interaction
-    const footprints = document.querySelectorAll('.footprint');
-    const infoText = document.getElementById('info-text');
-    
-    const footprintInfo = {
-        'social': 'Social media posts create a significant part of your digital footprint. Even deleted posts may remain in databases.',
-        'comments': 'Online comments on articles, videos, or forums contribute to your digital footprint and can be traced back to you.',
-        'photos': 'Photos you upload or are tagged in become part of your digital footprint. Metadata in photos can reveal location and time.',
-        'searches': 'Your search history is recorded by search engines and can be used to build a profile of your interests.',
-        'purchases': 'Online shopping creates a record of your buying habits, preferences, and financial information.'
-    };
-    
-    footprints.forEach(footprint => {
-        footprint.addEventListener('click', function() {
-            // Remove active class from all footprints
-            footprints.forEach(f => f.classList.remove('active'));
-            // Add active class to clicked footprint
-            this.classList.add('active');
-            // Update info text
-            const infoType = this.getAttribute('data-info');
-            infoText.textContent = footprintInfo[infoType];
+document.querySelectorAll('.footprint').forEach(footprint => {
+    footprint.addEventListener('click', function() {
+        document.querySelector('.footprint.active')?.classList.remove('active');
+        this.classList.add('active');
+        const infoText = document.getElementById('info-text');
+        const type = this.getAttribute('data-info');
+        const infoMap = {
+            'social': 'Social media posts create a significant part of your digital footprint. Even "private" accounts can be screenshotted and shared. Colleges and employers often review applicants\' social media profiles.',
+            'comments': 'Online comments on articles, videos, or forums contribute to your digital footprint. Thoughtful comments can demonstrate expertise, while negative comments can harm your reputation.',
+            'photos': 'Photos you upload or are tagged in create visual evidence of your digital footprint. Remember that facial recognition technology can link photos to your identity across platforms.',
+            'searches': 'Your search history reveals your interests and concerns. While typically private, data breaches or shared devices can expose this information.',
+            'purchases': 'Online shopping creates a record of your buying habits, preferences, and financial information. This data is often used for targeted advertising.',
+            'location': 'Location data from check-ins, maps, or photos with geotags reveals where you live, work, and spend time, potentially compromising your physical privacy.',
+            'apps': 'The apps you use and how you use them contribute to your digital footprint. Many apps collect extensive data about your behavior and preferences.',
+            'emails': 'Emails create a permanent record of your communications. Even deleted emails may exist in backups or recipients\' accounts indefinitely.'
+        };
+        infoText.textContent = infoMap[type] || 'Click on the footprints above to learn what contributes to your digital footprint.';
+    });
+});
+
+const dragItems = document.querySelectorAll('.drag-item');
+const dropArea = document.querySelector('.drop-area');
+
+dragItems.forEach(item => {
+    item.addEventListener('dragstart', function(e) {
+        e.dataTransfer.setData('text/plain', this.dataset.type);
+        setTimeout(() => this.classList.add('dragging'), 0);
+    });
+
+    item.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+    });
+});
+
+dropArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropArea.classList.add('highlight');
+});
+
+dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('highlight');
+});
+
+dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    dropArea.classList.remove('highlight');
+    const type = e.dataTransfer.getData('text/plain');
+    const draggedItem = document.querySelector(`.drag-item[data-type="${type}"]`);
+    if (!dropArea.querySelector(`[data-type="${type}"]`)) {
+        const clone = draggedItem.cloneNode(true);
+        clone.setAttribute('draggable', 'false');
+        clone.classList.remove('drag-item');
+        clone.classList.add('dropped-item');
+        clone.style.cursor = 'default';
+
+        const removeBtn = document.createElement('span');
+        removeBtn.innerHTML = ' <i class="fas fa-times"></i>';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.color = 'red';
+        removeBtn.addEventListener('click', function() {
+            this.parentElement.remove();
         });
-    });
-    
-    // Drag and drop activity
-    const dragItems = document.querySelectorAll('.drag-item');
-    const dropArea = document.querySelector('.drop-area');
-    
-    // Add drag event listeners to items
-    dragItems.forEach(item => {
-        item.addEventListener('dragstart', dragStart);
-    });
-    
-    // Drop area event listeners
-    dropArea.addEventListener('dragover', dragOver);
-    dropArea.addEventListener('dragleave', dragLeave);
-    dropArea.addEventListener('drop', drop);
-    
-    function dragStart(e) {
-        e.dataTransfer.setData('text/plain', e.target.textContent);
-        e.dataTransfer.setData('type', e.target.getAttribute('data-type'));
-        setTimeout(() => {
-            e.target.classList.add('hidden');
-        }, 0);
+
+        clone.appendChild(removeBtn);
+        dropArea.appendChild(clone);
+        dropArea.querySelector('p').style.display = 'none';
     }
-    
-    function dragOver(e) {
-        e.preventDefault();
-        dropArea.classList.add('highlight');
-    }
-    
-    function dragLeave() {
-        dropArea.classList.remove('highlight');
-    }
-    
-    function drop(e) {
-        e.preventDefault();
-        dropArea.classList.remove('highlight');
-        
-        const text = e.dataTransfer.getData('text/plain');
-        const type = e.dataTransfer.getData('type');
-        
-        const droppedItem = document.createElement('div');
-        droppedItem.className = 'drag-item';
-        droppedItem.textContent = text;
-        droppedItem.setAttribute('data-type', type);
-        droppedItem.draggable = true;
-        droppedItem.addEventListener('dragstart', dragStart);
-        
-        dropArea.innerHTML = '';
-        dropArea.appendChild(droppedItem);
-        dropArea.querySelector('p').classList.add('hidden');
-    }
-    
-     const analyzeBtn = document.getElementById('analyze-btn');
-    const analysisResult = document.getElementById('analysis-result');
+});
+
+document.getElementById('analyze-btn').addEventListener('click', function() {
+    const droppedItems = document.querySelectorAll('.dropped-item');
     const resultText = document.getElementById('result-text');
-    
-    analyzeBtn.addEventListener('click', function() {
-        const droppedItem = dropArea.querySelector('.drag-item');
-        
-        if (!droppedItem) {
-            resultText.textContent = "You haven't added any items to analyze. Drag an item to the drop area first.";
+    const analysisResult = document.getElementById('analysis-result');
+
+    if (droppedItems.length === 0) {
+        resultText.innerHTML = '<p class="warning"><i class="fas fa-exclamation-triangle"></i> You haven\'t added any items to analyze! Drag some items to the drop area first.</p>';
+    } else {
+        let footprintSize = '';
+        let privacyLevel = '';
+
+        if (droppedItems.length <= 2) {
+            footprintSize = 'small';
+            privacyLevel = 'relatively private';
+        } else if (droppedItems.length <= 4) {
+            footprintSize = 'moderate';
+            privacyLevel = 'somewhat exposed';
         } else {
-            const type = droppedItem.getAttribute('data-type');
-            const analysis = {
-                'social': "Social media profiles are a major part of digital footprints. Make sure your profiles present you professionally and have appropriate privacy settings.",
-                'search': "Search history reveals your interests and can be used to target ads. Consider using private browsing for sensitive searches.",
-                'photo': "Photos can reveal more than you intend through metadata and background details. Always check what's visible in photos before sharing.",
-                'comment': "Online comments can have lasting impact. Always communicate respectfully as comments may be seen by future employers or colleges.",
-                'purchase': "Online purchases create records of your spending habits and personal information. Use secure payment methods and check privacy policies."
-            };
-            
-            resultText.textContent = analysis[type];
+            footprintSize = 'large';
+            privacyLevel = 'very exposed';
         }
-        
-        analysisResult.style.display = 'block';
-    });
-    
-    // Quiz functionality
-    const quizForm = document.getElementById('quiz-form');
-    const quizResults = document.getElementById('quiz-results');
-    const scoreDisplay = document.getElementById('score');
-    const feedbackDisplay = document.getElementById('feedback');
-    const saveResultsBtn = document.getElementById('save-results');
-    
-    const correctAnswers = {
+
+        resultText.innerHTML = `
+            <p>Your digital footprint analysis shows:</p>
+            <ul>
+                <li><i class="fas fa-${footprintSize === 'small' ? 'check-circle' : 'exclamation-circle'}"></i> <strong>Size:</strong> ${footprintSize} (${droppedItems.length} major components identified)</li>
+                <li><i class="fas fa-${privacyLevel.includes('private') ? 'check-circle' : 'exclamation-circle'}"></i> <strong>Privacy Level:</strong> Your online presence is ${privacyLevel}</li>
+                <li><i class="fas fa-lightbulb"></i> <strong>Recommendation:</strong> ${getRecommendation(footprintSize, privacyLevel)}</li>
+            </ul>
+        `;
+    }
+
+    analysisResult.classList.remove('hidden');
+});
+
+function getRecommendation(size, privacy) {
+    if (size === 'small' && privacy.includes('private')) {
+        return "You're doing great! Keep being mindful of what you share online.";
+    } else if (size === 'moderate') {
+        return "Consider reviewing your privacy settings and being more selective about what you share.";
+    } else {
+        return "Your digital footprint is quite extensive. It might be time to audit your online presence and remove unnecessary personal information.";
+    }
+}
+
+document.getElementById('reset-btn')?.addEventListener('click', function() {
+    document.querySelectorAll('.dropped-item').forEach(item => item.remove());
+    dropArea.querySelector('p').style.display = 'block';
+    document.getElementById('analysis-result').classList.add('hidden');
+});
+
+document.getElementById('quiz-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const answers = {
         q1: 'b',
         q2: 'c',
         q3: 'c',
         q4: 'c',
         q5: 'c'
     };
-    
-    quizForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        let score = 0;
-        const userAnswers = {};
-        
-        // Get user answers
-        for (let i = 1; i <= 5; i++) {
-            const questionName = 'q' + i;
-            const selectedOption = quizForm.querySelector(`input[name="${questionName}"]:checked`);
-            
-            if (selectedOption) {
-                userAnswers[questionName] = selectedOption.value;
-                if (selectedOption.value === correctAnswers[questionName]) {
-                    score++;
-                }
+
+    let score = 0;
+    let userAnswers = {};
+
+    for (let question in answers) {
+        const selected = this.querySelector(`input[name="${question}"]:checked`);
+        if (selected) {
+            userAnswers[question] = selected.value;
+            if (selected.value === answers[question]) {
+                score++;
             }
         }
-        
-        // Display results
-        scoreDisplay.textContent = score;
-        
-        if (score === 5) {
-            feedbackDisplay.textContent = "Excellent! You have a strong understanding of digital footprints.";
-        } else if (score >= 3) {
-            feedbackDisplay.textContent = "Good job! You understand the basics but could review some concepts.";
-        } else {
-            feedbackDisplay.textContent = "Consider reviewing the lesson materials to improve your understanding of digital footprints.";
-        }
-        
-        quizResults.style.display = 'block';
-        
-        // Scroll to results
-        quizResults.scrollIntoView({ behavior: 'smooth' });
-    });
-    
-    // Save results to JSON
-    saveResultsBtn.addEventListener('click', function() {
-        const score = parseInt(scoreDisplay.textContent);
-        const date = new Date().toISOString().split('T')[0];
-        
-        // Create result object
-        const result = {
-            date: date,
-            score: score,
-            maxScore: 5,
-            topic: "Digital Footprints"
-        };
-        
-         saveToJson(result);
-        
-        // Provide feedback
-        alert(`Your quiz results have been saved!\nScore: ${score}/5\nDate: ${date}`);
-    });
-    
-     function saveToJson(data) {
-       
-        console.log("Data saved to JSON:", JSON.stringify(data, null, 2));
-        
-     
-    initializeInteractiveElements();
+    }
+
+    const quizResults = document.getElementById('quiz-results');
+    const scoreElement = document.getElementById('score');
+    const feedbackElement = document.getElementById('feedback');
+    const userScoreElement = document.getElementById('user-score');
+    const currentUserRow = document.getElementById('current-user-row');
+    const leaderboardMessage = document.getElementById('leaderboard-message');
+
+    scoreElement.textContent = score;
+    userScoreElement.textContent = `${score}/5`;
+
+    const circle = document.getElementById('score-circle');
+    const circumference = 2 * Math.PI * 50;
+    const offset = circumference - (score / 5) * circumference;
+    circle.style.strokeDashoffset = offset;
+
+    if (score === 5) {
+        feedbackElement.innerHTML = '<p><i class="fas fa-check-circle"></i> Excellent! You have a strong understanding of digital footprints.</p>';
+    } else if (score >= 3) {
+        feedbackElement.innerHTML = '<p><i class="fas fa-thumbs-up"></i> Good job! You understand the basics but could review some concepts.</p>';
+    } else {
+        feedbackElement.innerHTML = '<p><i class="fas fa-book"></i> Review the lesson materials to improve your understanding of digital footprints.</p>';
+    }
+
+    quizResults.classList.remove('hidden');
+    currentUserRow.classList.remove('hidden');
+    leaderboardMessage.classList.remove('hidden');
+
+    setTimeout(() => {
+        document.getElementById('leaderboard').scrollIntoView({ behavior: 'smooth' });
+    }, 1000);
+
+    const quizResultsJSON = {
+        score: score,
+        total: 5,
+        answers: userAnswers,
+        timestamp: new Date().toISOString()
+    };
+
+    localStorage.setItem('quizResults', JSON.stringify(quizResultsJSON));
 });
 
-function initializeInteractiveElements() {
- }
+document.getElementById('save-results')?.addEventListener('click', function() {
+    alert('Your quiz results have been saved to your profile!');
+});
